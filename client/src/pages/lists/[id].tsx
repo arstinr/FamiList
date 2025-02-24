@@ -8,19 +8,16 @@ import type { List, Task } from "@shared/schema";
 
 export default function ListDetails() {
   const { id } = useParams();
-  const listId = parseInt(id);
+  if (!id) return <div>Invalid List ID</div>;
 
-  const { data: list } = useQuery<List>({ 
-    queryKey: [`/api/lists/${listId}`],
-    enabled: !isNaN(listId)
-  });
+  const { data: list } = useQuery(['list', id], () => getList(id));
 
   const { data: tasks, isLoading } = useQuery<Task[]>({
-    queryKey: [`/api/lists/${listId}/tasks`],
-    enabled: !isNaN(listId)
+    queryKey: [`/api/lists/${id}/tasks`],
+    enabled: !isNaN(parseInt(id))
   });
 
-  if (isNaN(listId)) {
+  if (isNaN(parseInt(id))) {
     return <div>Invalid list ID</div>;
   }
 
@@ -39,7 +36,7 @@ export default function ListDetails() {
         </Link>
         <div className="flex justify-between items-center gap-4 flex-wrap">
           <h1 className="text-2xl font-bold">{list?.name}</h1>
-          <AddTask listId={listId} />
+          <AddTask listId={parseInt(id)} />
         </div>
       </div>
 

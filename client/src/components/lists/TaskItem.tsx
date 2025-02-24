@@ -43,13 +43,15 @@ interface TaskItemProps {
   task: Task;
 }
 
+type Priority = "low" | "medium" | "high";
+
 export default function TaskItem({ task }: TaskItemProps) {
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [description, setDescription] = useState(task.description);
   const [notes, setNotes] = useState(task.notes || "");
-  const [urgency, setUrgency] = useState(task.urgency || "medium");
-  const [importance, setImportance] = useState(task.importance || "medium");
+  const [urgency, setUrgency] = useState<Priority>(task.urgency || "medium");
+  const [importance, setImportance] = useState<Priority>(task.importance || "medium");
   const { toast } = useToast();
 
   const { data: users = [], isLoading, error } = useQuery({
@@ -102,6 +104,8 @@ export default function TaskItem({ task }: TaskItemProps) {
       default: return 'bg-gray-500';
     }
   };
+
+  const assignedUser = task.assignedTo ? users.find(u => u.username === task.assignedTo) : null;
 
   return (
     <Card>
@@ -190,14 +194,14 @@ export default function TaskItem({ task }: TaskItemProps) {
           <div className="flex items-center gap-2 mb-2">
             <div className="flex items-center gap-1">
               <span className="text-sm text-muted-foreground">Urgency:</span>
-              <Badge variant="secondary" className={cn("text-white", getPriorityColor(task.urgency))}>
-                {task.urgency}
+              <Badge variant="secondary" className={cn("text-white", getPriorityColor(urgency))}>
+                {urgency}
               </Badge>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-sm text-muted-foreground">Importance:</span>
-              <Badge variant="secondary" className={cn("text-white", getPriorityColor(task.importance))}>
-                {task.importance}
+              <Badge variant="secondary" className={cn("text-white", getPriorityColor(importance))}>
+                {importance}
               </Badge>
             </div>
           </div>

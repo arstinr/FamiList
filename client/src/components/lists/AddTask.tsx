@@ -39,6 +39,12 @@ interface AddTaskProps {
   listId: number;
 }
 
+interface User {
+  id: string;
+  name: string;
+  // ... other user properties
+}
+
 export default function AddTask({ listId }: AddTaskProps) {
   const [open, setOpen] = useState(false);
   const [assigneeOpen, setAssigneeOpen] = useState(false);
@@ -81,6 +87,8 @@ export default function AddTask({ listId }: AddTaskProps) {
   const { data: users = [] } = useQuery({
     queryKey: ['/api/users'],
   });
+
+  const userData = users as User[];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -151,10 +159,10 @@ export default function AddTask({ listId }: AddTaskProps) {
                 <CommandInput placeholder="Search member..." />
                 <CommandEmpty>No member found.</CommandEmpty>
                 <CommandGroup>
-                  {users.map((user) => (
+                  {userData.map((user: User) => (
                     <CommandItem
                       key={user.id}
-                      value={user.username}
+                      value={user.name}
                       onSelect={(currentValue) => {
                         setAssignedTo(currentValue);
                         setAssigneeOpen(false);
@@ -163,10 +171,10 @@ export default function AddTask({ listId }: AddTaskProps) {
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          assignedTo === user.username ? "opacity-100" : "opacity-0"
+                          assignedTo === user.name ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      {user.username}
+                      {user.name}
                     </CommandItem>
                   ))}
                 </CommandGroup>

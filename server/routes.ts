@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertListSchema, insertTaskSchema, updateTaskSchema } from "@shared/schema";
 import { setupAuth } from "./auth";
+import { Request, Response, NextFunction } from 'express';
 
 // Middleware to check if user is authenticated
 function isAuthenticated(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
@@ -32,13 +33,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(lists);
   });
 
-  app.post("/api/lists", isAuthenticated, async (req, res) => {
+  app.post("/api/lists", isAuthenticated, async (req: Request, res: Response) => {
     const result = insertListSchema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({ error: "Invalid list data" });
     }
     const list = await storage.createList({
-      ...result.data,
+      name: req.body.name,
+      description: req.body.description,
       userId: req.user!.id
     });
     res.json(list);
@@ -114,6 +116,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     await storage.deleteTask(id);
     res.status(204).end();
+  });
+
+  // Fix status property
+  app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
+    res.status(err.status || 500).json({ message: err.message });
+    next(err);
   });
 
   const httpServer = createServer(app);
