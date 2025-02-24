@@ -8,7 +8,7 @@ import { db } from './db';
 import { lists } from '@shared/schema';
 
 // Middleware to check if user is authenticated
-function isAuthenticated(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+function isAuthenticated(req: Request, res: Response, next: NextFunction) {
   if (req.isAuthenticated()) {
     return next();
   }
