@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,15 +22,6 @@ import type { Task } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
-const familyMembers = [
-  "Mom",
-  "Dad",
-  "Sister",
-  "Brother",
-  "Grandma",
-  "Grandpa",
-];
-
 interface TaskItemProps {
   task: Task;
 }
@@ -38,6 +29,10 @@ interface TaskItemProps {
 export default function TaskItem({ task }: TaskItemProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+
+  const { data: users = [], isLoading, error } = useQuery({
+    queryKey: ['/api/users'],
+  });
 
   const updateTask = useMutation({
     mutationFn: async (data: Partial<Task>) => {
@@ -100,10 +95,10 @@ export default function TaskItem({ task }: TaskItemProps) {
                 <CommandInput placeholder="Search member..." />
                 <CommandEmpty>No member found.</CommandEmpty>
                 <CommandGroup>
-                  {familyMembers.map((member) => (
+                  {users.map((user) => (
                     <CommandItem
-                      key={member}
-                      value={member}
+                      key={user.id}
+                      value={user.username}
                       onSelect={(currentValue) => {
                         updateTask.mutate({ 
                           assignedTo: currentValue === task.assignedTo ? null : currentValue 
@@ -114,10 +109,10 @@ export default function TaskItem({ task }: TaskItemProps) {
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          task.assignedTo === member ? "opacity-100" : "opacity-0"
+                          task.assignedTo === user.username ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      {member}
+                      {user.username}
                     </CommandItem>
                   ))}
                 </CommandGroup>

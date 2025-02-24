@@ -16,6 +16,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
   setupAuth(app);
 
+  // Add this new route to get all users (without sensitive information)
+  app.get("/api/users", isAuthenticated, async (req, res) => {
+    const users = await storage.getUsers();
+    // Only send necessary user information
+    res.json(users.map(user => ({
+      id: user.id,
+      username: user.username
+    })));
+  });
+
   // Protected routes
   app.get("/api/lists", isAuthenticated, async (req, res) => {
     const lists = await storage.getLists();

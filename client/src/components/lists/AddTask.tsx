@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,15 +26,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { Plus, Check, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const familyMembers = [
-  "Mom",
-  "Dad",
-  "Sister",
-  "Brother",
-  "Grandma",
-  "Grandpa",
-];
 
 interface AddTaskProps {
   listId: number;
@@ -69,6 +60,10 @@ export default function AddTask({ listId }: AddTaskProps) {
       createTask.mutate();
     }
   };
+
+  const { data: users = [] } = useQuery({
+    queryKey: ['/api/users'],
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -105,10 +100,10 @@ export default function AddTask({ listId }: AddTaskProps) {
                 <CommandInput placeholder="Search member..." />
                 <CommandEmpty>No member found.</CommandEmpty>
                 <CommandGroup>
-                  {familyMembers.map((member) => (
+                  {users.map((user) => (
                     <CommandItem
-                      key={member}
-                      value={member}
+                      key={user.id}
+                      value={user.username}
                       onSelect={(currentValue) => {
                         setAssignedTo(currentValue);
                         setAssigneeOpen(false);
@@ -117,18 +112,18 @@ export default function AddTask({ listId }: AddTaskProps) {
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
-                          assignedTo === member ? "opacity-100" : "opacity-0"
+                          assignedTo === user.username ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      {member}
+                      {user.username}
                     </CommandItem>
                   ))}
                 </CommandGroup>
               </Command>
             </PopoverContent>
           </Popover>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full"
             disabled={createTask.isPending || !description.trim()}
           >

@@ -1,40 +1,33 @@
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function AuthPage() {
   const [, setLocation] = useLocation();
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { toast } = useToast();
+  const { user, loginMutation, registerMutation } = useAuth();
 
-  const authMutation = useMutation({
-    mutationFn: async () => {
-      const endpoint = isLogin ? "/api/login" : "/api/register";
-      await apiRequest("POST", endpoint, { username, password });
-    },
-    onSuccess: () => {
-      toast({ description: `${isLogin ? "Login" : "Registration"} successful` });
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
       setLocation("/");
-    },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        description: error.message,
-      });
-    },
-  });
+    }
+  }, [user, setLocation]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (username.trim() && password.trim()) {
-      authMutation.mutate();
+      const credentials = { username, password };
+      if (isLogin) {
+        loginMutation.mutate(credentials);
+      } else {
+        registerMutation.mutate(credentials);
+      }
     }
   };
 
@@ -62,7 +55,7 @@ export default function AuthPage() {
             <Button
               type="submit"
               className="w-full"
-              disabled={authMutation.isPending}
+              disabled={loginMutation.isPending || registerMutation.isPending}
             >
               {isLogin ? "Login" : "Register"}
             </Button>
