@@ -188,12 +188,18 @@ export default function TaskItem({ task }: TaskItemProps) {
             </p>
           )}
           <div className="flex items-center gap-2 mb-2">
-            <Badge variant="secondary" className={cn("text-white", getPriorityColor(task.urgency))}>
-              {task.urgency}
-            </Badge>
-            <Badge variant="secondary" className={cn("text-white", getPriorityColor(task.importance))}>
-              {task.importance}
-            </Badge>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-muted-foreground">Urgency:</span>
+              <Badge variant="secondary" className={cn("text-white", getPriorityColor(task.urgency))}>
+                {task.urgency}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-muted-foreground">Importance:</span>
+              <Badge variant="secondary" className={cn("text-white", getPriorityColor(task.importance))}>
+                {task.importance}
+              </Badge>
+            </div>
           </div>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
