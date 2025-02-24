@@ -23,10 +23,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html",
-      "headers": {
-        "Cache-Control": "no-cache, no-store, must-revalidate"
-      }
+      "dest": "/public/index.html"
     }
   ],
   "env": {
