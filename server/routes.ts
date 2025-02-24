@@ -3,7 +3,9 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertListSchema, insertTaskSchema, updateTaskSchema } from "@shared/schema";
 import { setupAuth } from "./auth";
-import { Express, Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
+import { db } from './db';
+import { lists } from '@shared/schema';
 
 // Middleware to check if user is authenticated
 function isAuthenticated(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
@@ -34,16 +36,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/lists", isAuthenticated, async (req: Request, res: Response) => {
-    const result = insertListSchema.safeParse(req.body);
-    if (!result.success) {
-      return res.status(400).json({ error: "Invalid list data" });
+    try {
+      const list = await db.insert(lists).values({
+        name: req.body.name,
+        description: req.body.description,
+        userId: req.user?.id // assuming req.user exists from auth middleware
+      });
+      res.json(list);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to create list' });
     }
-    const list = await storage.createList({
-      name: req.body.name,
-      description: req.body.description,
-      userId: req.body.userId
-    });
-    res.json(list);
   });
 
   app.delete("/api/lists/:id", isAuthenticated, async (req, res) => {
@@ -119,8 +121,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Fix status property
-  app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
-    res.status(err.status || 500).json({ message: err.message });
+  app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
+    const statusCode = (err as any).status || 500;
+    res.status(statusCode).json({ message: err.message });
     next(err);
   });
 
