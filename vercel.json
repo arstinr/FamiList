@@ -14,9 +14,11 @@
       "dest": "/api/index.js"
     },
     {
-      "src": "/(assets|images|fonts)/.*",
-      "headers": { "cache-control": "public, max-age=31536000, immutable" },
-      "continue": true
+      "src": "^/assets/(.*)",
+      "dest": "/public/assets/$1",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
     },
     {
       "handle": "filesystem"

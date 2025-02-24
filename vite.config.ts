@@ -32,6 +32,7 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, "dist/public"),
     emptyOutDir: true,
+    assetsDir: "assets",
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, "client/index.html"),

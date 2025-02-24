@@ -7,8 +7,13 @@ import path from "path";
 const app = express();
 app.use(express.json());
 
-// Serve static files from the public directory
-app.use(express.static(path.join(process.cwd(), 'dist', 'public')));
+// In development, use Vite's static file serving
+if (process.env.NODE_ENV === 'development') {
+  await serveStatic(app);
+} else {
+  // In production, serve from the dist/public directory
+  app.use(express.static(path.join(process.cwd(), 'dist', 'public')));
+}
 
 // Add a test route
 app.get('/api/test', (req, res) => {
@@ -18,7 +23,7 @@ app.get('/api/test', (req, res) => {
 // Initialize routes
 await registerRoutes(app);
 
-// Handle client-side routing
+// Handle client-side routing - this should be last
 app.get('*', (req, res) => {
   if (req.url.startsWith('/api')) return;
   res.sendFile(path.join(process.cwd(), 'dist', 'public', 'index.html'));
