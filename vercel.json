@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
   "builds": [
     {
       "src": "dist/index.js",
@@ -16,8 +17,11 @@
       "dest": "dist/index.js"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
-      "dest": "dist/public/$1"
+      "dest": "dist/public/index.html"
     }
   ]
 } 
