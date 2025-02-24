@@ -5,12 +5,16 @@ import { Toaster } from "@/components/ui/toaster";
 import Lists from "@/pages/lists";
 import ListDetails from "@/pages/lists/[id]";
 import NotFound from "@/pages/not-found";
+import AuthPage from "@/pages/auth";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Lists} />
-      <Route path="/lists/:id" component={ListDetails} />
+      <Route path="/auth" component={AuthPage} />
+      <ProtectedRoute path="/" component={Lists} />
+      <ProtectedRoute path="/lists/:id" component={ListDetails} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -19,8 +23,10 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <AuthProvider>
+        <Router />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
