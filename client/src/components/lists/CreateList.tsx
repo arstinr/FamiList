@@ -9,6 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
@@ -17,17 +18,19 @@ import { Plus } from "lucide-react";
 export default function CreateList() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const { toast } = useToast();
 
   const createList = useMutation({
     mutationFn: async () => {
-      await apiRequest('POST', '/api/lists', { name });
+      await apiRequest('POST', '/api/lists', { name, description });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/lists'] });
       toast({ description: "List created successfully" });
       setOpen(false);
       setName("");
+      setDescription("");
     }
   });
 
@@ -55,6 +58,12 @@ export default function CreateList() {
             placeholder="List name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+          />
+          <Textarea
+            placeholder="List description (optional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="min-h-[100px]"
           />
           <Button 
             type="submit" 

@@ -61,8 +61,17 @@ export default function Lists() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Tap to view and manage tasks
+                {list.description ? (
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {list.description}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic mb-2">
+                    No description provided
+                  </p>
+                )}
+                <p className="text-sm text-blue-500 hover:underline">
+                  Click to view tasks
                 </p>
               </CardContent>
             </Link>

@@ -20,7 +20,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
@@ -35,14 +43,20 @@ export default function AddTask({ listId }: AddTaskProps) {
   const [open, setOpen] = useState(false);
   const [assigneeOpen, setAssigneeOpen] = useState(false);
   const [description, setDescription] = useState("");
+  const [notes, setNotes] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
+  const [urgency, setUrgency] = useState("medium");
+  const [importance, setImportance] = useState("medium");
   const { toast } = useToast();
 
   const createTask = useMutation({
     mutationFn: async () => {
       await apiRequest('POST', `/api/lists/${listId}/tasks`, {
         description,
-        assignedTo: assignedTo || null
+        notes,
+        assignedTo: assignedTo || null,
+        urgency,
+        importance
       });
     },
     onSuccess: () => {
@@ -50,7 +64,10 @@ export default function AddTask({ listId }: AddTaskProps) {
       toast({ description: "Task added successfully" });
       setOpen(false);
       setDescription("");
+      setNotes("");
       setAssignedTo("");
+      setUrgency("medium");
+      setImportance("medium");
     }
   });
 
@@ -83,6 +100,40 @@ export default function AddTask({ listId }: AddTaskProps) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
+          <Textarea
+            placeholder="Add notes (optional)"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            className="min-h-[100px]"
+          />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Urgency</label>
+              <Select value={urgency} onValueChange={setUrgency}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select urgency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Importance</label>
+              <Select value={importance} onValueChange={setImportance}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select importance" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <Popover open={assigneeOpen} onOpenChange={setAssigneeOpen}>
             <PopoverTrigger asChild>
               <Button

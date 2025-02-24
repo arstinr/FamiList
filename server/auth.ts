@@ -6,6 +6,8 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { Pool } from "@neondatabase/serverless";
+import connectPgSimple from "connect-pg-simple";
 
 declare global {
   namespace Express {
@@ -29,8 +31,20 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is required for session storage");
+  }
+
+  const PostgresStore = connectPgSimple(session);
+  const sessionStore = new PostgresStore({
+    conObject: {
+      connectionString: process.env.DATABASE_URL,
+    },
+  });
+
   const sessionSettings: session.SessionOptions = {
-    secret: randomBytes(32).toString('hex'), // Generate a random secret
+    store: sessionStore,
+    secret: process.env.SESSION_SECRET || randomBytes(32).toString('hex'),
     resave: false,
     saveUninitialized: false,
     cookie: {
