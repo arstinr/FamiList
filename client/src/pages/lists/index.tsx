@@ -38,27 +38,33 @@ export default function Lists() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {lists?.map((list) => (
-          <Card key={list.id}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xl font-semibold">
-                <Link href={`/lists/${list.id}`} className="hover:underline">
+          <Card 
+            key={list.id} 
+            className="cursor-pointer transition-colors hover:bg-accent"
+          >
+            <Link href={`/lists/${list.id}`}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-xl font-semibold">
                   {list.name}
-                </Link>
-              </CardTitle>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => deleteList.mutate(list.id)}
-                disabled={deleteList.isPending}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Click to view and manage tasks
-              </p>
-            </CardContent>
+                </CardTitle>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.preventDefault(); // Prevent navigation
+                    deleteList.mutate(list.id);
+                  }}
+                  disabled={deleteList.isPending}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  Click to view and manage tasks
+                </p>
+              </CardContent>
+            </Link>
           </Card>
         ))}
       </div>
