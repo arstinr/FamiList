@@ -30,17 +30,17 @@ export default function Lists() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto px-4 py-6 max-w-lg">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Family Lists</h1>
+        <h1 className="text-2xl font-bold">Family Lists</h1>
         <CreateList />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="space-y-4">
         {lists?.map((list) => (
           <Card 
             key={list.id} 
-            className="cursor-pointer transition-colors hover:bg-accent"
+            className="transition-colors hover:bg-accent"
           >
             <Link href={`/lists/${list.id}`}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -50,18 +50,19 @@ export default function Lists() {
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="h-10 w-10"
                   onClick={(e) => {
-                    e.preventDefault(); // Prevent navigation
+                    e.preventDefault();
                     deleteList.mutate(list.id);
                   }}
                   disabled={deleteList.isPending}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-5 w-5" />
                 </Button>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Click to view and manage tasks
+                  Tap to view and manage tasks
                 </p>
               </CardContent>
             </Link>

@@ -29,16 +29,16 @@ export default function ListDetails() {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto px-4 py-6 max-w-lg">
       <div className="mb-6">
         <Link href="/">
-          <Button variant="ghost" className="mb-4">
-            <ChevronLeft className="mr-2 h-4 w-4" />
+          <Button variant="ghost" size="lg" className="mb-4 -ml-3">
+            <ChevronLeft className="mr-2 h-5 w-5" />
             Back to Lists
           </Button>
         </Link>
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold">{list?.name}</h1>
+        <div className="flex justify-between items-center gap-4 flex-wrap">
+          <h1 className="text-2xl font-bold">{list?.name}</h1>
           <AddTask listId={listId} />
         </div>
       </div>
@@ -48,7 +48,7 @@ export default function ListDetails() {
           <TaskItem key={task.id} task={task} />
         ))}
         {tasks?.length === 0 && (
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-muted-foreground py-8">
             No tasks yet. Add one to get started!
           </p>
         )}

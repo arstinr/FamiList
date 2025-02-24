@@ -66,33 +66,36 @@ export default function TaskItem({ task }: TaskItemProps) {
 
   return (
     <Card>
-      <CardContent className="flex items-center p-4">
+      <CardContent className="flex items-center p-4 gap-4">
         <Checkbox
           checked={task.completed}
           onCheckedChange={(checked) => 
             updateTask.mutate({ completed: checked as boolean })
           }
-          className="mr-4"
+          className="h-6 w-6"
         />
-        <span className={`flex-grow ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
-          {task.description}
-        </span>
-        <div className="flex items-center gap-2 ml-4">
+        <div className="flex-grow">
+          <span className={cn(
+            "block text-base mb-1",
+            task.completed && "line-through text-muted-foreground"
+          )}>
+            {task.description}
+          </span>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
-                className="w-[140px] justify-between"
+                className="h-9 w-full justify-between mt-2"
               >
                 {task.assignedTo || "Unassigned"}
                 <User className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[140px] p-0">
+            <PopoverContent className="w-[200px] p-0">
               <Command>
-                <CommandInput placeholder="Search member..." />
+                <CommandInput placeholder="Search member..." className="h-9" />
                 <CommandEmpty>No member found.</CommandEmpty>
                 <CommandGroup>
                   {users.map((user) => (
@@ -105,6 +108,7 @@ export default function TaskItem({ task }: TaskItemProps) {
                         });
                         setOpen(false);
                       }}
+                      className="py-3"
                     >
                       <Check
                         className={cn(
@@ -119,15 +123,16 @@ export default function TaskItem({ task }: TaskItemProps) {
               </Command>
             </PopoverContent>
           </Popover>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => deleteTask.mutate()}
-            disabled={deleteTask.isPending}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => deleteTask.mutate()}
+          disabled={deleteTask.isPending}
+          className="h-10 w-10 flex-shrink-0"
+        >
+          <Trash2 className="h-5 w-5" />
+        </Button>
       </CardContent>
     </Card>
   );

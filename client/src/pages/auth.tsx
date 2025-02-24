@@ -32,12 +32,15 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-full max-w-md mx-4">
-        <CardHeader>
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-3">
           <CardTitle className="text-2xl font-bold text-center">
             {isLogin ? "Welcome Back" : "Create Account"}
           </CardTitle>
+          <p className="text-center text-muted-foreground">
+            Manage your family tasks together
+          </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -45,16 +48,18 @@ export default function AuthPage() {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              className="h-11"
             />
             <Input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="h-11"
             />
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-11 text-lg"
               disabled={loginMutation.isPending || registerMutation.isPending}
             >
               {isLogin ? "Login" : "Register"}
@@ -62,7 +67,7 @@ export default function AuthPage() {
             <Button
               type="button"
               variant="ghost"
-              className="w-full"
+              className="w-full h-11"
               onClick={() => setIsLogin(!isLogin)}
             >
               {isLogin ? "Need an account? Register" : "Have an account? Login"}
