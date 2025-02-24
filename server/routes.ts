@@ -1,9 +1,10 @@
+import express, { Request, Response, NextFunction } from "express";
 import type { Express } from "express";
-import { createServer, type Server } from "http";
+import { Server } from "http";
+import { createServer } from "http";
 import { storage } from "./storage";
 import { insertListSchema, insertTaskSchema, updateTaskSchema } from "@shared/schema";
 import { setupAuth } from "./auth";
-import { Request, Response, NextFunction } from 'express';
 import { db } from './db';
 import { lists } from '@shared/schema';
 
