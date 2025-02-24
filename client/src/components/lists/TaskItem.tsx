@@ -2,20 +2,40 @@ import { useMutation } from "@tanstack/react-query";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Trash2, User } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Trash2, User, Check } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { useState } from "react";
 import type { Task } from "@shared/schema";
+import { cn } from "@/lib/utils";
+
+const familyMembers = [
+  "Mom",
+  "Dad",
+  "Sister",
+  "Brother",
+  "Grandma",
+  "Grandpa",
+];
 
 interface TaskItemProps {
   task: Task;
 }
 
 export default function TaskItem({ task }: TaskItemProps) {
-  const [isAssigning, setIsAssigning] = useState(false);
-  const [assignee, setAssignee] = useState(task.assignedTo || "");
+  const [open, setOpen] = useState(false);
 
   const updateTask = useMutation({
     mutationFn: async (data: Partial<Task>) => {
@@ -35,13 +55,6 @@ export default function TaskItem({ task }: TaskItemProps) {
     }
   });
 
-  const handleAssign = () => {
-    if (isAssigning) {
-      updateTask.mutate({ assignedTo: assignee || null });
-    }
-    setIsAssigning(!isAssigning);
-  };
-
   return (
     <Card>
       <CardContent className="flex items-center p-4">
@@ -56,26 +69,45 @@ export default function TaskItem({ task }: TaskItemProps) {
           {task.description}
         </span>
         <div className="flex items-center gap-2 ml-4">
-          {isAssigning ? (
-            <Input
-              value={assignee}
-              onChange={(e) => setAssignee(e.target.value)}
-              className="w-32"
-              placeholder="Assignee name"
-            />
-          ) : task.assignedTo ? (
-            <span className="text-sm text-muted-foreground flex items-center">
-              <User className="h-4 w-4 mr-1" />
-              {task.assignedTo}
-            </span>
-          ) : null}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleAssign}
-          >
-            <User className="h-4 w-4" />
-          </Button>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-[140px] justify-between"
+              >
+                {task.assignedTo || "Unassigned"}
+                <User className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[140px] p-0">
+              <Command>
+                <CommandInput placeholder="Search member..." />
+                <CommandEmpty>No member found.</CommandEmpty>
+                <CommandGroup>
+                  {familyMembers.map((member) => (
+                    <CommandItem
+                      key={member}
+                      value={member}
+                      onSelect={(currentValue) => {
+                        updateTask.mutate({ assignedTo: currentValue });
+                        setOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          task.assignedTo === member ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {member}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
           <Button
             variant="ghost"
             size="icon"

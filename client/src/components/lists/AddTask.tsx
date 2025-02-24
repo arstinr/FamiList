@@ -8,11 +8,33 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
-import { Plus } from "lucide-react";
+import { Plus, Check, User } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const familyMembers = [
+  "Mom",
+  "Dad",
+  "Sister",
+  "Brother",
+  "Grandma",
+  "Grandpa",
+];
 
 interface AddTaskProps {
   listId: number;
@@ -20,6 +42,7 @@ interface AddTaskProps {
 
 export default function AddTask({ listId }: AddTaskProps) {
   const [open, setOpen] = useState(false);
+  const [assigneeOpen, setAssigneeOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
   const { toast } = useToast();
@@ -28,7 +51,7 @@ export default function AddTask({ listId }: AddTaskProps) {
     mutationFn: async () => {
       await apiRequest('POST', `/api/lists/${listId}/tasks`, {
         description,
-        assignedTo: assignedTo.trim() || null
+        assignedTo: assignedTo || null
       });
     },
     onSuccess: () => {
@@ -65,11 +88,45 @@ export default function AddTask({ listId }: AddTaskProps) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
-          <Input
-            placeholder="Assign to (optional)"
-            value={assignedTo}
-            onChange={(e) => setAssignedTo(e.target.value)}
-          />
+          <Popover open={assigneeOpen} onOpenChange={setAssigneeOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={assigneeOpen}
+                className="w-full justify-between"
+              >
+                {assignedTo || "Select assignee"}
+                <User className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[200px] p-0">
+              <Command>
+                <CommandInput placeholder="Search member..." />
+                <CommandEmpty>No member found.</CommandEmpty>
+                <CommandGroup>
+                  {familyMembers.map((member) => (
+                    <CommandItem
+                      key={member}
+                      value={member}
+                      onSelect={(currentValue) => {
+                        setAssignedTo(currentValue);
+                        setAssigneeOpen(false);
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          assignedTo === member ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {member}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
           <Button 
             type="submit" 
             className="w-full"
