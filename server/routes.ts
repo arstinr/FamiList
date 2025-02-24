@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertListSchema, insertTaskSchema, updateTaskSchema } from "@shared/schema";
 import { setupAuth } from "./auth";
-import { Request, Response, NextFunction } from 'express';
+import { Express, Request, Response, NextFunction } from 'express';
 
 // Middleware to check if user is authenticated
 function isAuthenticated(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
@@ -41,7 +41,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const list = await storage.createList({
       name: req.body.name,
       description: req.body.description,
-      userId: req.user!.id
+      userId: req.body.userId
     });
     res.json(list);
   });
