@@ -6,6 +6,11 @@ import { serveStatic } from "../server/vite";
 const app = express();
 app.use(express.json());
 
+// Add a test route
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working' });
+});
+
 // Initialize routes
 await registerRoutes(app);
 

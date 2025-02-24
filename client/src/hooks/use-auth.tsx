@@ -74,7 +74,19 @@ function useLogoutMutation() {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: user, error, isLoading } = useQuery<User>({
     queryKey: ["/api/user"],
+    queryFn: async () => {
+      try {
+        const res = await apiRequest("GET", "/api/user");
+        return res.json();
+      } catch (error) {
+        if (error instanceof Error && error.message.includes("Unauthorized")) {
+          return null;
+        }
+        throw error;
+      }
+    },
     retry: false,
+    staleTime: Infinity,
   });
 
   const loginMutation = useLoginMutation();
