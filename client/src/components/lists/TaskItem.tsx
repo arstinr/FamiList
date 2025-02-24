@@ -20,6 +20,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useState } from "react";
 import type { Task } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const familyMembers = [
   "Mom",
@@ -36,13 +37,25 @@ interface TaskItemProps {
 
 export default function TaskItem({ task }: TaskItemProps) {
   const [open, setOpen] = useState(false);
+  const { toast } = useToast();
 
   const updateTask = useMutation({
     mutationFn: async (data: Partial<Task>) => {
-      await apiRequest('PATCH', `/api/tasks/${task.id}`, data);
+      const res = await apiRequest('PATCH', `/api/tasks/${task.id}`, data);
+      if (!res.ok) {
+        throw new Error('Failed to update task');
+      }
+      return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/lists/${task.listId}/tasks`] });
+      toast({ description: "Task updated successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ 
+        variant: "destructive",
+        description: error.message 
+      });
     }
   });
 
@@ -52,6 +65,7 @@ export default function TaskItem({ task }: TaskItemProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/lists/${task.listId}/tasks`] });
+      toast({ description: "Task deleted successfully" });
     }
   });
 
@@ -91,7 +105,9 @@ export default function TaskItem({ task }: TaskItemProps) {
                       key={member}
                       value={member}
                       onSelect={(currentValue) => {
-                        updateTask.mutate({ assignedTo: currentValue });
+                        updateTask.mutate({ 
+                          assignedTo: currentValue === task.assignedTo ? null : currentValue 
+                        });
                         setOpen(false);
                       }}
                     >
