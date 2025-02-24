@@ -77,6 +77,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(task);
   });
 
+  app.patch("/api/lists/:id", isAuthenticated, async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid list ID" });
+    }
+
+    const result = insertListSchema.safeParse(req.body); //Potentially incorrect schema
+    if (!result.success) {
+      return res.status(400).json({ error: "Invalid list data" });
+    }
+
+    const list = await storage.updateList(id, result.data);
+    res.json(list);
+  });
+
   app.patch("/api/tasks/:id", isAuthenticated, async (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) {

@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -70,9 +70,9 @@ export default function TaskItem({ task }: TaskItemProps) {
       setEditOpen(false);
     },
     onError: (error: Error) => {
-      toast({ 
+      toast({
         variant: "destructive",
-        description: error.message 
+        description: error.message
       });
     }
   });
@@ -108,7 +108,7 @@ export default function TaskItem({ task }: TaskItemProps) {
       <CardContent className="flex items-center p-4 gap-4">
         <Checkbox
           checked={task.completed}
-          onCheckedChange={(checked) => 
+          onCheckedChange={(checked) =>
             updateTask.mutate({ completed: checked as boolean })
           }
           className="h-6 w-6"
@@ -171,8 +171,8 @@ export default function TaskItem({ task }: TaskItemProps) {
                       </Select>
                     </div>
                   </div>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full"
                     disabled={updateTask.isPending || !description.trim()}
                   >
@@ -189,10 +189,10 @@ export default function TaskItem({ task }: TaskItemProps) {
           )}
           <div className="flex items-center gap-2 mb-2">
             <Badge variant="secondary" className={cn("text-white", getPriorityColor(task.urgency))}>
-              Urgency: {task.urgency}
+              {task.urgency}
             </Badge>
             <Badge variant="secondary" className={cn("text-white", getPriorityColor(task.importance))}>
-              Importance: {task.importance}
+              {task.importance}
             </Badge>
           </div>
           <Popover open={open} onOpenChange={setOpen}>
@@ -217,8 +217,8 @@ export default function TaskItem({ task }: TaskItemProps) {
                       key={user.id}
                       value={user.username}
                       onSelect={(currentValue) => {
-                        updateTask.mutate({ 
-                          assignedTo: currentValue === task.assignedTo ? null : currentValue 
+                        updateTask.mutate({
+                          assignedTo: currentValue === task.assignedTo ? null : currentValue
                         });
                         setOpen(false);
                       }}

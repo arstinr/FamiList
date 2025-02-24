@@ -14,6 +14,7 @@ export interface IStorage {
   getList(id: number): Promise<List | undefined>;
   createList(list: InsertList): Promise<List>;
   deleteList(id: number): Promise<void>;
+  updateList(id: number, list: InsertList): Promise<List>;
 
   // Task operations
   getTasks(listId: number): Promise<Task[]>;
@@ -61,6 +62,16 @@ export class DatabaseStorage implements IStorage {
   async deleteList(id: number): Promise<void> {
     await db.delete(tasks).where(eq(tasks.listId, id));
     await db.delete(lists).where(eq(lists.id, id));
+  }
+
+  async updateList(id: number, updateData: InsertList): Promise<List> {
+    const [list] = await db.update(lists)
+      .set(updateData)
+      .where(eq(lists.id, id))
+      .returning();
+
+    if (!list) throw new Error("List not found");
+    return list;
   }
 
   // Task operations
